@@ -1,0 +1,50 @@
+<!-- Inside the top of `<head>` section, add these 3 lines: -->
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#1a4da1">
+<link rel="apple-touch-icon" href="https://via.placeholder.com/192">
+
+
+<!-- Inside the top of your `<script>` tag at the bottom, replace the previous javascript with this loader block -->
+<script>
+    // 1. PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(e => console.log('SW Registration failed: ', e));
+      });
+    }
+
+    // 2. ⚡ LIVE API CONNECTION BRIDGE ⚡
+    // PASTE YOUR BRAND NEW GOOGLE APPS SCRIPT WEB APP URL BELOW:
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwk5jWH4wjT0mg0ezxINkWXALvCabf16LdvOn3qIxJnCtMEPbGwgIhN7EMLP0v1S_RL/exec";
+
+    const google = {
+      script: {
+        run: {
+          withSuccessHandler: function(callback) {
+            return new Proxy({}, {
+              get: function(target, funcName) {
+                return async function(...args) {
+                  try {
+                    const res = await fetch(SCRIPT_URL, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                      body: JSON.stringify({ action: funcName, args: args })
+                    });
+                    const data = await res.json();
+                    if (callback) callback(data);
+                  } catch (e) {
+                    console.error("API Error: ", e);
+                    if (callback) callback({ success: false, message: "Network Error: Check Connection." });
+                  }
+                };
+              }
+            });
+          }
+        }
+      }
+    };
+
+    // Keep all your other standard UI Logic (like `window.onload`, `login()`, `showQuestion()`) exactly the same below...
+    let questions = []; let config = {}; let responses = {}; let marked = {};
+    // ... rest of logic
+</script>
