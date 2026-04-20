@@ -7,7 +7,7 @@
   "theme_color": "#1a4da1",
   "icons": [
     {
-      "src": "https://via.placeholder.com/192",
+      "src": "./icon.png",
       "sizes": "192x192",
       "type": "image/png"
     },
